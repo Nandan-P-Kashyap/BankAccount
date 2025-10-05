@@ -1,10 +1,20 @@
 package com.account.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "TRANSACTION", schema = "C##ACCOUNT_DB")
@@ -14,6 +24,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class TransactionEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transaction_seq_gen")
     @SequenceGenerator(name = "transaction_seq_gen", sequenceName = "SEQ_TRANSACTION_ID", allocationSize = 1)

@@ -3,24 +3,25 @@ package com.account.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.account.dto.NewUserDto;
 import com.account.entities.AccountEntity;
 
 public interface AccountService {
 	
-	AccountEntity createAccount(AccountEntity account);
+	AccountEntity createAccount(NewUserDto account, Long userId);
 
-	AccountEntity getByAccountNumber(String accountNumber);
+	AccountEntity getByAccountNumber(Long accountNumber);
 
-	AccountEntity updateAccount(String accountNumber, AccountEntity update);
+	AccountEntity updateAccount(Long accountNumber, AccountEntity update);
 
-	void deleteAccount(String accountNumber);
+	void deleteAccount(Long accountNumber);
 
 	List<AccountEntity> listAll();
 
-	AccountEntity deposit(String accountNumber, BigDecimal amount);
+	AccountEntity deposit(Long accountNumber, BigDecimal amount);
 
-	AccountEntity withdraw(String accountNumber, BigDecimal amount);
+	AccountEntity withdraw(Long accountNumber, BigDecimal amount);
 
-	void transfer(String fromAccountNumber, String toAccountNumber, BigDecimal amount);
+	void transfer(Long fromAccountNumber, Long toAccountNumber, BigDecimal amount);
 
 }

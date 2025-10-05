@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import jakarta.persistence.EntityManager;
+
+@EnableFeignClients(basePackages = "com.account.proxy")
 
 @SpringBootApplication
 public class AccountApplication implements CommandLineRunner {

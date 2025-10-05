@@ -1,6 +1,5 @@
 package com.account.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -12,10 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.account.dto.DebitCreditDto;
+import com.account.dto.NewUserDto;
 import com.account.dto.TransferRequest;
 import com.account.entities.AccountEntity;
 import com.account.service.AccountService;
@@ -23,19 +22,19 @@ import com.account.service.AccountService;
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
-
+		
     private final AccountService svc;
 
     public AccountController(AccountService svc) { this.svc = svc; }
 
-    @PostMapping
-    public ResponseEntity<AccountEntity> create(@RequestBody @Validated AccountEntity account) {
-    	AccountEntity saved = svc.createAccount(account);
+    @PostMapping("/register/{userId}")
+    public ResponseEntity<AccountEntity> create(@RequestBody @Validated NewUserDto account ,@PathVariable Long userId) {
+    	AccountEntity saved = svc.createAccount(account , userId);
         return ResponseEntity.ok(saved);
     }
 
     @GetMapping("/{acctNo}")
-    public ResponseEntity<AccountEntity> get(@PathVariable("acctNo") String acctNo) {
+    public ResponseEntity<AccountEntity> get(@PathVariable("acctNo") Long acctNo) {
         return ResponseEntity.ok(svc.getByAccountNumber(acctNo));
     }
 
@@ -45,13 +44,13 @@ public class AccountController {
     }
 
     @PutMapping("/{acctNo}")
-    public ResponseEntity<AccountEntity> update(@PathVariable("acctNo") String acctNo,
+    public ResponseEntity<AccountEntity> update(@PathVariable("acctNo") Long acctNo,
                                           @RequestBody AccountEntity update) {
         return ResponseEntity.ok(svc.updateAccount(acctNo, update));
     }
 
     @DeleteMapping("/{acctNo}")
-    public ResponseEntity<Void> delete(@PathVariable("acctNo") String acctNo) {
+    public ResponseEntity<Void> delete(@PathVariable("acctNo") Long acctNo) {
         svc.deleteAccount(acctNo);
         return ResponseEntity.noContent().build();
     }

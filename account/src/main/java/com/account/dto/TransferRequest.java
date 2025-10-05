@@ -9,10 +9,10 @@ import lombok.Data;
 @Data
 public class TransferRequest {
 	@NotBlank
-	private String fromAccount;
+	private Long fromAccount;
 
 	@NotBlank
-	private String toAccount;
+	private Long toAccount;
 
 	@Positive
 	private BigDecimal amount;

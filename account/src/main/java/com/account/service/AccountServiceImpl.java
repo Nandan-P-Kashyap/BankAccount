@@ -7,10 +7,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.account.dto.NewUserDto;
+import com.account.dto.UserEntityDto;
 import com.account.entities.AccountEntity;
 import com.account.entities.TransactionEntity;
 import com.account.exception.InsufficientFundsException;
 import com.account.exception.NotFoundException;
+import com.account.proxy.UserProxy;
 import com.account.repo.AccountRepo;
 import com.account.repo.TransactionRepo;
 
@@ -23,6 +26,8 @@ public class AccountServiceImpl implements AccountService {
 	
 	private AccountRepo acc;
 	private TransactionRepo tran;
+	@Autowired
+	private UserProxy userproxy;
 	
 	@Autowired
 	public AccountServiceImpl(AccountRepo acc, TransactionRepo tran) {
@@ -30,21 +35,32 @@ public class AccountServiceImpl implements AccountService {
 		this.tran = tran;
 	}
 	@Override
-	public AccountEntity createAccount(AccountEntity newaccount) {
+	public AccountEntity createAccount(NewUserDto newaccount , Long userId) {
 		if(newaccount.getBalance() == null) {
 			newaccount.setBalance(BigDecimal.ZERO);
 		}
-		return acc.save(newaccount);
+		UserEntityDto newUser = userproxy.getById(userId).getBody();
+		
+		AccountEntity newAccount = AccountEntity.builder()
+				.userId(newUser.getUserId())
+				.accountHolder(newUser.getUsername())
+				.balance(newaccount.getBalance())
+				.accountType(newaccount.getAccountType())
+				.createdAt(LocalDateTime.now())
+				.build();
+		acc.save(newAccount);
+		return newAccount;
+	
 	}
 	@Override
-	public AccountEntity getByAccountNumber(String accountNumber) {
+	public AccountEntity getByAccountNumber(Long accountNumber) {
 		return acc.findByAccountNumber(accountNumber)
 				.orElseThrow(()->new NotFoundException("Account not found: " + accountNumber));
 		
 	}
 	
 	@Override
-	public AccountEntity updateAccount(String accountNumber, AccountEntity update) {
+	public AccountEntity updateAccount(Long accountNumber, AccountEntity update) {
 		AccountEntity existing = getByAccountNumber(accountNumber);
 		existing.setAccountHolder(update.getAccountHolder());
 		existing.setAccountType(update.getAccountType());
@@ -52,7 +68,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public void deleteAccount(String accountNumber) {
+	public void deleteAccount(Long accountNumber) {
 		AccountEntity a = getByAccountNumber(accountNumber);
 		acc.delete(a);
 	}
@@ -62,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 	@Override
 	@Transactional
-	public AccountEntity deposit(String accountNumber, BigDecimal amount) {
+	public AccountEntity deposit(Long accountNumber, BigDecimal amount) {
 		
 		System.out.println("Depositing to accountNo: " + accountNumber);
 		if (amount.compareTo(BigDecimal.ZERO) <= 0)
@@ -84,7 +100,7 @@ public class AccountServiceImpl implements AccountService {
 				
 	}
 	@Override
-	public AccountEntity withdraw(String accountNumber, BigDecimal amount) {
+	public AccountEntity withdraw(Long accountNumber, BigDecimal amount) {
 		if (amount.compareTo(BigDecimal.ZERO) <= 0)
 			throw new IllegalArgumentException("Amount must be > 0");
 		AccountEntity a = getByAccountNumber(accountNumber);
@@ -106,7 +122,7 @@ public class AccountServiceImpl implements AccountService {
 		    return updatedAccount;
 	}
 	@Override
-	public void transfer(String fromAccountNumber, String toAccountNumber, BigDecimal amount) {
+	public void transfer(Long fromAccountNumber, Long toAccountNumber, BigDecimal amount) {
 		if(fromAccountNumber.equals(toAccountNumber))
 			throw new IllegalArgumentException("Can't transfer to same account");
 		AccountEntity from = getByAccountNumber(fromAccountNumber);
